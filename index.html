@@ -478,30 +478,18 @@
   "use strict";
 
   const OBJECOES = [
-    "Está muito caro.",
-    "Prefiro financiar.",
-    "Não quero pagar por algo que não vai ser meu.",
-    "Vou pensar.",
-    "Preciso falar com meu marido/esposa.",
-    "Quero pesquisar outras opções.",
-    "48 meses é muito tempo.",
-    "Vou esperar mais um pouco.",
-    "Me manda tudo pelo WhatsApp."
+    "Achei a mensalidade muito alta.",
+    "Pode falar comigo mesmo. Eu passo para o meu marido depois",
+    "48 meses é muito tempo."
   ];
 
   const CONDICOES = [
-    "Você só pode fazer perguntas, mas não pode soar insistente.",
-    "Descubra o motivo real antes de argumentar e mude a visão do cliente a partir dele.",
-    "Defenda o valor sem mencionar nenhum benefício \"genérico\".",
-    "Use uma informação descoberta na sondagem “contra” o cliente.",
-    "Termine conduzindo para o próximo passo e dê um ultimato no cliente.",
-    "Aplique senso de urgência de forma efetiva e sem pressionar.",
-    "Não pode usar as palavras \"preço\", “valor”, previsibilidade” e “tudo incluso”.",
-    "Faça o cliente perceber o custo de não resolver o problema.",
-    "Não fale nenhum benefício da assinatura até descobrir uma dor do cliente."
+    "Não pode usar a palavra “preço”, “valor” ou “previsibilidade”.",
+    "Valide o ponto do cliente antes de argumentar.",
+    "Defenda a proposta atual sem oferecer outra opção de plano, prazo ou veículo."
   ];
 
-  const SEG_COUNT = 9;
+  const SEG_COUNT = OBJECOES.length;
   const SEG_ANGLE = 360 / SEG_COUNT;
   const R = 250, CX = 250, CY = 250, RADIUS = 240;
 
