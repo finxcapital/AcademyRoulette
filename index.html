@@ -69,7 +69,49 @@
     text-shadow:0 2px 24px rgba(201,162,39,.25);
   }
 
-  .mode-wrap{ margin:28px 0 8px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .day-selector{
+    display:flex;
+    gap:8px;
+    margin:18px 0 6px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .day-btn{
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--panel-line);
+    color:var(--cream-dim);
+    padding:8px 16px;
+    border-radius:999px;
+    font-family:'Inter',sans-serif;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .25s ease;
+    user-select:none;
+  }
+  .day-btn:hover{
+    border-color:var(--gold);
+    color:var(--cream);
+  }
+  .day-btn.active{
+    background:rgba(201,162,39,.14);
+    border-color:var(--gold);
+    color:var(--gold-light);
+    box-shadow:0 0 12px rgba(201,162,39,.18);
+    font-weight:600;
+  }
+  .day-objective{
+    font-size:12px;
+    color:var(--cream-dim);
+    opacity:.8;
+    text-align:center;
+    max-width:540px;
+    margin:2px 0 0;
+    line-height:1.45;
+  }
+
+  .mode-wrap{ margin:20px 0 8px; display:flex; flex-direction:column; align-items:center; gap:10px; }
   .mode-labels{ display:flex; justify-content:space-between; width:190px; font-family:'Inter'; font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
   .mode-labels span{ opacity:.55; transition:opacity .35s, color .35s; }
   .mode-labels span.active{ opacity:1; }
@@ -387,6 +429,13 @@
     <h1>Roleta de Cenários</h1>
   </header>
 
+  <div class="day-selector" id="daySelector">
+    <button class="day-btn active" data-day="terca">Terça · Segurança</button>
+    <button class="day-btn" data-day="quarta">Quarta · Intenção</button>
+    <button class="day-btn" data-day="quinta">Quinta · Condução</button>
+  </div>
+  <p class="day-objective" id="dayObjective">Objetivo: sair do automático e trabalhar firmeza, agilidade e confiança</p>
+
   <div class="mode-wrap">
     <div class="mode-labels">
       <span class="lbl-obj active" id="lblObj">Objeção</span>
@@ -477,24 +526,61 @@
 (function(){
   "use strict";
 
-  const OBJECOES = [
-    "Gostei, mas ainda não estou convencido.",
-    "A parcela do financiamento ficou praticamente igual.",
-    "Sou alto. Preciso de um carro grande custando pouco."
-  ];
+  const DATA = {
+    terca: {
+      title: "Terça — SEGURANÇA",
+      objective: "Objetivo: sair do automático e trabalhar firmeza, agilidade e confiança",
+      objecoes: [
+        "Achei a mensalidade muito alta.",
+        "Pode falar comigo mesmo. Eu passo para o meu marido depois",
+        "48 meses é muito tempo."
+      ],
+      condicoes: [
+        "Não pode usar a palavra “preço”, “valor” ou “previsibilidade”.",
+        "Valide o ponto do cliente antes de argumentar.",
+        "Defenda a proposta atual sem oferecer outra opção de plano, prazo ou veículo."
+      ]
+    },
+    quarta: {
+      title: "Quarta — INTENÇÃO",
+      objective: "Objetivo: trabalhar a qualidade das perguntas. Menos interrogatório, mais diagnóstico.",
+      objecoes: [
+        "Gostei, mas ainda não estou convencido.",
+        "A parcela do financiamento ficou praticamente igual.",
+        "Sou alto. Preciso de um carro grande custando pouco."
+      ],
+      condicoes: [
+        "Você só pode fazer UMA pergunta antes de argumentar. Seja estratégico.",
+        "Descubra o motivo real antes de apresentar qualquer argumento.",
+        "Use uma informação descoberta durante o roleplay para construir sua resposta."
+      ]
+    },
+    quinta: {
+      title: "Quinta — CONDUÇÃO",
+      objective: "Objetivo: trabalhar capacidade de assumir o volante e não deixar a negociação aberta",
+      objecoes: [
+        "Me manda a proposta que depois eu olho.",
+        "Preciso conversar com minha esposa antes.",
+        "Gostei de tudo, só não quero decidir hoje."
+      ],
+      condicoes: [
+        "Termine conduzindo para um próximo passo concreto e aplique senso de urgência.",
+        "Não pode usar as frases “qualquer dúvida, me chama”, “você me avisa” ou equivalentes.",
+        "Saia da conversa com compromissos firmados, data e horário de retomada combinados."
+      ]
+    }
+  };
 
-  const CONDICOES = [
-    "Você só pode fazer UMA pergunta antes de argumentar. Seja estratégico.",
-    "Descubra o motivo real antes de apresentar qualquer argumento.",
-    "Use uma informação descoberta durante o roleplay para construir sua resposta."
-  ];
+  const usedState = {
+    terca: { obj: new Set(), cond: new Set() },
+    quarta: { obj: new Set(), cond: new Set() },
+    quinta: { obj: new Set(), cond: new Set() }
+  };
 
-  const SEG_COUNT = OBJECOES.length;
+  let currentDay = "terca";
+  const SEG_COUNT = 3;
   const SEG_ANGLE = 360 / SEG_COUNT;
   const R = 250, CX = 250, CY = 250, RADIUS = 240;
-
-  const usedObj = new Set();
-  const usedCond = new Set();
 
   let mode = "obj";
   let currentRotation = 0;
@@ -662,7 +748,7 @@
   buildWheel();
 
   function refreshSegmentStyles(){
-    const used = mode === "obj" ? usedObj : usedCond;
+    const used = usedState[currentDay][mode];
     document.querySelectorAll("#wheel .seg").forEach(seg=>{
       const idx = parseInt(seg.getAttribute("data-index"), 10);
       if(used.has(idx)){
@@ -698,7 +784,7 @@
   const progressEl = document.getElementById("progress");
   function renderProgress(){
     progressEl.innerHTML = "";
-    const used = mode === "obj" ? usedObj : usedCond;
+    const used = usedState[currentDay][mode];
     for(let i=0;i<SEG_COUNT;i++){
       const d = document.createElement("div");
       d.className = "dot" + (used.has(i) ? " used" : "");
@@ -767,7 +853,7 @@
   });
 
   function updateHint(){
-    const used = mode === "obj" ? usedObj : usedCond;
+    const used = usedState[currentDay][mode];
     if(used.size >= SEG_COUNT){
       hint.textContent = "";
       doneMsg.classList.add("show");
@@ -793,7 +879,7 @@
 
   function spin(){
     if(spinning) return;
-    const used = mode === "obj" ? usedObj : usedCond;
+    const used = usedState[currentDay][mode];
     const pool = [];
     for(let i=0;i<SEG_COUNT;i++) if(!used.has(i)) pool.push(i);
     if(pool.length === 0){
@@ -854,13 +940,13 @@
     wheelFrame.classList.remove("spinning");
     hub.classList.remove("disabled");
 
-    const used = mode === "obj" ? usedObj : usedCond;
+    const used = usedState[currentDay][mode];
     used.add(index);
     renderProgress();
     refreshSegmentStyles();
     updateHint();
 
-    const phrase = (mode === "obj" ? OBJECOES : CONDICOES)[index];
+    const phrase = (mode === "obj" ? DATA[currentDay].objecoes : DATA[currentDay].condicoes)[index];
     openScroll(mode, index, phrase);
   }
 
@@ -890,13 +976,32 @@
 
   document.getElementById("resetBtn").addEventListener("click", ()=>{
     if(spinning) return;
-    usedObj.clear();
-    usedCond.clear();
+    usedState[currentDay].obj.clear();
+    usedState[currentDay].cond.clear();
     renderProgress();
     refreshSegmentStyles();
     updateHint();
     closeScroll();
     try{ clickSound(); }catch(e){}
+  });
+
+  const dayObjectiveEl = document.getElementById("dayObjective");
+  const dayButtons = document.querySelectorAll(".day-btn");
+
+  dayButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      if(spinning) return;
+      const day = btn.getAttribute("data-day");
+      if(day === currentDay) return;
+      currentDay = day;
+      dayButtons.forEach(b => b.classList.toggle("active", b === btn));
+      dayObjectiveEl.textContent = DATA[currentDay].objective;
+      try{ clickSound(); }catch(e){}
+      renderProgress();
+      refreshSegmentStyles();
+      updateHint();
+      closeScroll();
+    });
   });
 
   updateHint();
