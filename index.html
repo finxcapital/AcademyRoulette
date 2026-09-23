@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -172,15 +172,13 @@
     margin:38px 0 26px;
   }
   .glow-ring{
-    position:absolute; inset:-22px;
+    position:absolute; inset:-12px;
     border-radius:50%;
-    background:conic-gradient(from 0deg, transparent 0deg, rgba(201,162,39,.55) 30deg, transparent 70deg, transparent 360deg);
-    filter:blur(6px);
+    box-shadow:0 0 20px rgba(201,162,39,.25);
     opacity:0;
     transition:opacity .4s;
   }
-  .wheel-frame.spinning .glow-ring{ opacity:1; animation:spinGlow 1.1s linear infinite; }
-  @keyframes spinGlow{ to{ transform:rotate(360deg); } }
+  .wheel-frame.spinning .glow-ring{ opacity:1; }
 
   .bulbs{ position:absolute; inset:-14px; border-radius:50%; pointer-events:none; }
   .bulb{
@@ -480,7 +478,7 @@
   const OBJECOES = [
     "Gostei, mas ainda não estou convencido.",
     "A parcela do financiamento ficou praticamente igual.",
-    "Sou alto. Preciso de um carro grande custando pouco.
+    "Sou alto. Preciso de um carro grande custando pouco."
   ];
 
   const CONDICOES = [
@@ -885,7 +883,6 @@
     overlay.classList.remove("show");
   }
   scrollClose.addEventListener("click", closeScroll);
-  overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeScroll(); });
   document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeScroll(); });
 
   document.getElementById("resetBtn").addEventListener("click", ()=>{
